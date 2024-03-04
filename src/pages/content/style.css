@@ -1,6 +1,19 @@
+/* *, ::before, ::after o */
+/* https://tailwindcss.com/docs/preflight#border-styles-are-reset-globally */
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-.langin{
+
+*,
+::before,
+::after {
+    border-width: 0;
+    border-style: solid;
+    border-color: transparent;
+}
+
+.langin {
     color: aliceblue;
 }
