@@ -7,7 +7,8 @@
   },
   "background": {
     "service_worker": "src/pages/background/index.ts",
-    "type": "module"
+    "type": "module",
+    "persistent": true
   },
   "action": {
     "default_popup": "src/pages/popup/index.html",
@@ -22,7 +23,8 @@
     "128": "icon-128.png"
   },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
   "content_scripts": [
     {
