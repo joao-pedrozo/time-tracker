@@ -13,8 +13,10 @@
   },
   "type": "module",
   "dependencies": {
+    "@types/tldjs": "^2.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "tldjs": "^2.3.1",
     "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {

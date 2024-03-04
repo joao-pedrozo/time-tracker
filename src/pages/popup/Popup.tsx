@@ -6,7 +6,7 @@ export default function Popup(): JSX.Element {
 
   useEffect(() => {
     chrome.storage.local.get("sitesData", (data) => {
-      console.log(data.sitesData);
+      console.log(data);
 
       if (data && data.sitesData) {
         setSitesData(data.sitesData);
@@ -34,9 +34,9 @@ export default function Popup(): JSX.Element {
           Learn React!
         </a>
         <ul>
-          {Object.entries(sitesData).map(([site, time]) => (
-            <li key={site} className="text-red-700">
-              <strong>{site}:</strong> {time} seconds
+          {Object.keys(sitesData).map((site) => (
+            <li key={site}>
+              {sitesData[site].url}: {sitesData[site].timeSpent}
             </li>
           ))}
         </ul>
