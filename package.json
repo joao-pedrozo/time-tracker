@@ -13,6 +13,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@phosphor-icons/react": "^2.0.15",
     "@types/tldjs": "^2.3.4",
     "apexcharts": "^3.46.0",
     "chart.js": "^4.4.2",

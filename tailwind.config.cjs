@@ -9,4 +9,5 @@ module.exports = {
   },
   prefix: '',
   plugins: [],
+  darkMode: 'class',
 }

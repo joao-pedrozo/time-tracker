@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import logo from "@assets/img/logo.svg";
 import { Doughnut } from "react-chartjs-2";
 import { ArcElement, Chart as ChartJS, Tooltip } from "chart.js";
+import { MoonStars } from "@phosphor-icons/react";
 
 ChartJS.register(ArcElement);
 ChartJS.register(Tooltip);
@@ -60,12 +61,24 @@ export default function Popup(): JSX.Element {
   }, []);
 
   return (
-    <div className="flex items-center flex-col p-4">
-      <h1 className="text-center mb-4 font-bold text-2xl bg-gradient-to-r from-green-400 to-blue-500 inline-block text-transparent bg-clip-text">
-        Webtime Tracker
-      </h1>
+    <div className="flex items-center flex-col bg-white dark:dark:bg-[#0f0f0f]">
+      <header className="w-full font-bold text-2xl flex justify-between items-center px-4 py-4">
+        <h1 className="mb-4 bg-gradient-to-r from-green-400 to-blue-500 inline-block text-transparent bg-clip-text">
+          Webtime Tracker
+        </h1>
+        <div className="mt-[-8px]">
+          <button
+            onClick={() => {
+              const body = document.querySelector("body");
+              body?.classList.toggle("dark");
+            }}
+          >
+            <MoonStars className="p-0 text-black dark:text-white" size={24} />
+          </button>
+        </div>
+      </header>
       {sitesData && (
-        <div className="max-w-[260px] max-h-[260px] ">
+        <div className="max-w-[260px] max-h-[260px]">
           <Doughnut
             data={{
               labels: orderedSitesData(getTopSites(sitesData, 9)).map(
@@ -106,11 +119,13 @@ export default function Popup(): JSX.Element {
           />
         </div>
       )}
-      <ul className="w-full text-[14px] text-neutral-600 mt-8">
+      <ul className="w-full text-[14px] text-neutral-600 mt-8 p-4">
         {orderedSitesData(getTopSites(sitesData, 9)).map((site) => (
           <li key={site.url} className="flex justify-between gap-4">
             <div className="max-w-[200px] truncate">
-              <span className="font-bold w-[200px]">{site.url}</span>
+              <span className="font-bold w-[200px] dark:text-[#e8e8e8]">
+                {site.url}
+              </span>
             </div>
             <div className="flex gap-2">
               <span>
