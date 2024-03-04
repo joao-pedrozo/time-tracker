@@ -2,6 +2,9 @@
 
 This is a ⏰ time tracker Chrome extension developed using React ⚛️, TypeScript 📝, Vite 🚀, ESLint 🧹, and Tailwind 🌈.
 
+![image](https://github.com/joao-pedrozo/time-tracker/assets/40037644/fb06d271-c697-43a9-906b-8e5aca4df034)
+
+
 ## Features
 
 - 🕒 Track and manage your time efficiently
