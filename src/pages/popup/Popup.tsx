@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import logo from "@assets/img/logo.svg";
-import { Pie } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 import { ArcElement, Chart as ChartJS, Tooltip } from "chart.js";
 
 ChartJS.register(ArcElement);
@@ -36,6 +36,14 @@ function formatSeconds(seconds: number) {
   return formattedTime;
 }
 
+const percentage = (value: number, total: number) => (value / total) * 100;
+
+const orderedSitesData = (sitesData: SitesData[]) =>
+  sitesData.sort((a, b) => b.timeSpent - a.timeSpent);
+
+const getTopSites = (sitesData: SitesData[], limit: number) =>
+  orderedSitesData(sitesData).slice(0, limit);
+
 export default function Popup(): JSX.Element {
   const [sitesData, setSitesData] = useState<SitesData[]>([]);
 
@@ -53,18 +61,29 @@ export default function Popup(): JSX.Element {
 
   return (
     <div className="flex items-center flex-col p-4">
-      <span className="text-center mb-4">Data</span>
+      <h1 className="text-center mb-4 font-bold text-2xl bg-gradient-to-r from-green-400 to-blue-500 inline-block text-transparent bg-clip-text">
+        Webtime Tracker
+      </h1>
       {sitesData && (
-        <div className="max-w-[350px] max-h-[350px] ">
-          <Pie
+        <div className="max-w-[260px] max-h-[260px] ">
+          <Doughnut
             data={{
-              labels: sitesData.map((site) => site.url),
+              labels: orderedSitesData(getTopSites(sitesData, 9)).map(
+                (site) => site.url
+              ),
               datasets: [
                 {
-                  data: sitesData.map((site) => site.timeSpent / 1000),
-                  backgroundColor: sitesData.map(
+                  data: orderedSitesData(getTopSites(sitesData, 9)).map(
+                    (site) => site.timeSpent / 1000
+                  ),
+                  backgroundColor: orderedSitesData(
+                    getTopSites(sitesData, 9)
+                  ).map(
                     (_, index) =>
-                      `hsl(${(index * 360) / sitesData.length}, 100%, 50%)`
+                      `hsl(${
+                        (index * 360) /
+                        orderedSitesData(getTopSites(sitesData, 9)).length
+                      }, 100%, 50%)`
                   ),
                 },
               ],
@@ -87,11 +106,22 @@ export default function Popup(): JSX.Element {
           />
         </div>
       )}
-      <span>Data</span>
-      <ul>
-        {sitesData.map((site) => (
-          <li key={site.url}>
-            {site.url} - {formatSeconds(site.timeSpent / 1000)}
+      <ul className="w-full text-[14px] text-neutral-600 mt-8">
+        {orderedSitesData(getTopSites(sitesData, 9)).map((site) => (
+          <li key={site.url} className="flex justify-between gap-4">
+            <div>
+              <span>{site.url}</span>
+            </div>
+            <div className="flex gap-2">
+              <span>
+                {percentage(
+                  site.timeSpent,
+                  sitesData.reduce((acc, site) => acc + site.timeSpent, 0)
+                ).toFixed(2)}
+                %
+              </span>
+              <span>{formatSeconds(site.timeSpent / 1000)}</span>
+            </div>
           </li>
         ))}
       </ul>
