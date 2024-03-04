@@ -109,8 +109,8 @@ export default function Popup(): JSX.Element {
       <ul className="w-full text-[14px] text-neutral-600 mt-8">
         {orderedSitesData(getTopSites(sitesData, 9)).map((site) => (
           <li key={site.url} className="flex justify-between gap-4">
-            <div>
-              <span>{site.url}</span>
+            <div className="max-w-[200px] truncate">
+              <span className="font-bold w-[200px]">{site.url}</span>
             </div>
             <div className="flex gap-2">
               <span>
