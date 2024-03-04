@@ -41,6 +41,9 @@ function stripDevIcons (apply: boolean) {
 }
 
 export default defineConfig({
+  define: {
+    __DEV__: isDev,
+  },
   resolve: {
     alias: {
       '@src': root,
