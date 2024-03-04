@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import logo from "@assets/img/logo.svg";
 import { Doughnut } from "react-chartjs-2";
 import { ArcElement, Chart as ChartJS, Tooltip } from "chart.js";
-import { MoonStars } from "@phosphor-icons/react";
+import { MoonStars, GithubLogo } from "@phosphor-icons/react";
 
 ChartJS.register(ArcElement);
 ChartJS.register(Tooltip);
@@ -29,7 +28,6 @@ function formatSeconds(seconds: number) {
       ? `${remainingSeconds}${remainingSeconds === 1 ? "s" : "s"}`
       : "";
 
-  // Concatenate the strings based on the presence of hours, minutes, and seconds
   const formattedTime = [hoursString, minutesString, secondsString]
     .filter(Boolean)
     .join(" ");
@@ -66,7 +64,7 @@ export default function Popup(): JSX.Element {
         <h1 className="mb-4 bg-gradient-to-r from-green-400 to-blue-500 inline-block text-transparent bg-clip-text">
           Webtime Tracker
         </h1>
-        <div className="mt-[-8px]">
+        <div className="mt-[-8px] flex gap-2">
           <button
             onClick={() => {
               const body = document.querySelector("body");
@@ -75,6 +73,13 @@ export default function Popup(): JSX.Element {
           >
             <MoonStars className="p-0 text-black dark:text-white" size={24} />
           </button>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href="https://github.com/joao-pedrozo/time-tracker"
+          >
+            <GithubLogo className="p-0 text-black dark:text-white" size={24} />
+          </a>
         </div>
       </header>
       {sitesData && (
@@ -108,7 +113,7 @@ export default function Popup(): JSX.Element {
                     label: (context) => {
                       const label = context.label || "";
                       const value = context.parsed || 0;
-                      return `${label}: ${value}s`;
+                      return formatSeconds(value);
                     },
                   },
                 },
@@ -119,23 +124,34 @@ export default function Popup(): JSX.Element {
           />
         </div>
       )}
-      <ul className="w-full text-[14px] text-neutral-600 mt-8 p-4">
-        {orderedSitesData(getTopSites(sitesData, 9)).map((site) => (
+      <ul className="w-full text-[14px] text-neutral-600 mt-8 p-4 pb-2">
+        {orderedSitesData(getTopSites(sitesData, 9)).map((site, index) => (
           <li key={site.url} className="flex justify-between gap-4">
-            <div className="max-w-[200px] truncate">
+            <div className="max-w-[200px] truncate flex gap-1 items-center">
+              <div
+                className="w-[6px] h-[6px] rounded-full"
+                style={{
+                  backgroundColor: `hsl(${
+                    (index * 360) /
+                    orderedSitesData(getTopSites(sitesData, 9)).length
+                  }, 100%, 50%)`,
+                }}
+              ></div>
               <span className="font-bold w-[200px] dark:text-[#e8e8e8]">
                 {site.url}
               </span>
             </div>
-            <div className="flex gap-2">
-              <span>
+            <div className="flex gap-2 flex-nowrap">
+              <span className="whitespace-nowrap">
                 {percentage(
                   site.timeSpent,
                   sitesData.reduce((acc, site) => acc + site.timeSpent, 0)
                 ).toFixed(2)}
                 %
               </span>
-              <span>{formatSeconds(site.timeSpent / 1000)}</span>
+              <span className="whitespace-nowrap">
+                {formatSeconds(site.timeSpent / 1000)}
+              </span>
             </div>
           </li>
         ))}
