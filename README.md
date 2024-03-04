@@ -13,7 +13,7 @@ This is a ⏰ time tracker Chrome extension developed using React ⚛️, TypeSc
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/time-tracker.git
+git clone https://github.com/joao-pedrozo/time-tracker.git
 ```
 
 2. Install dependencies using pnpm:
