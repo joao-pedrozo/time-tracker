@@ -44,7 +44,7 @@ setInterval(() => {
     const domain = url.split("/")?.[2];
 
     chrome.storage.local.get("sitesData", (data) => {
-      if (!data) {
+      if (!data?.sitesData) {
         chrome.storage.local.set({
           sitesData: [
             {
