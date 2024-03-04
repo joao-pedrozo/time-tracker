@@ -10,3 +10,7 @@ body {
 
   position: relative;
 }
+
+.apexcharts-legend {
+  display: none !important;
+}

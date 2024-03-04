@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import logo from "@assets/img/logo.svg";
-import Chart from "react-apexcharts";
+import { Pie } from "react-chartjs-2";
+import { ArcElement, Chart as ChartJS, Tooltip } from "chart.js";
+
+ChartJS.register(ArcElement);
+ChartJS.register(Tooltip);
 
 interface SitesData {
   url: string;
@@ -8,10 +12,36 @@ interface SitesData {
   timeSpent: number;
 }
 
+function formatSeconds(seconds: number) {
+  const hours = Math.floor(seconds / 3600);
+  const remainingMinutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  const hoursString =
+    hours > 0 ? `${hours} ${hours === 1 ? "hour" : "hours"}` : "";
+  const minutesString =
+    remainingMinutes > 0
+      ? `${remainingMinutes}${remainingMinutes === 1 ? "m" : "m"}`
+      : "";
+  const secondsString =
+    remainingSeconds > 0
+      ? `${remainingSeconds}${remainingSeconds === 1 ? "s" : "s"}`
+      : "";
+
+  // Concatenate the strings based on the presence of hours, minutes, and seconds
+  const formattedTime = [hoursString, minutesString, secondsString]
+    .filter(Boolean)
+    .join(" ");
+
+  return formattedTime;
+}
+
 export default function Popup(): JSX.Element {
   const [sitesData, setSitesData] = useState<SitesData[]>([]);
 
   useEffect(() => {
+    console.log("Popup mounted");
+
     chrome.storage.local.get("sitesData", (data) => {
       console.log(data);
 
@@ -22,46 +52,49 @@ export default function Popup(): JSX.Element {
   }, []);
 
   return (
-    // <div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800">
-    //   <header className="flex flex-col items-center justify-center text-white">
-    //     <img
-    //       src={logo}
-    //       className="h-36 pointer-events-none animate-spin-slow"
-    //       alt="logo"
-    //     />
-    //     <p>
-    //       Edit123 <code>src/pages/popup/Popup.jsx</code> and save to reload.
-    //     </p>
-    //     <a
-    //       className="text-blue-400"
-    //       href="https://reactjs.org"
-    //       target="_blank"
-    //       rel="noopener noreferrer"
-    //     >
-    //       Learn React!
-    //     </a>
-    //     <ul>
-    //       {sitesData.map((site) => (
-    //         <li key={site.url}>
-    //           {site.url} - {site.timeSpent}
-    //         </li>
-    //       ))}
-    //     </ul>
-    //   </header>
-
-    // </div>
-    <div>
-      <span>Data</span>
+    <div className="flex items-center flex-col p-4">
+      <span className="text-center mb-4">Data</span>
       {sitesData && (
-        <Chart
-          type="pie"
-          series={sitesData.map((site) => site.timeSpent)}
-          options={{
-            labels: sitesData.map((site) => site.url),
-          }}
-          width="500"
-        />
+        <div className="max-w-[350px] max-h-[350px] ">
+          <Pie
+            data={{
+              labels: sitesData.map((site) => site.url),
+              datasets: [
+                {
+                  data: sitesData.map((site) => site.timeSpent / 1000),
+                  backgroundColor: sitesData.map(
+                    (_, index) =>
+                      `hsl(${(index * 360) / sitesData.length}, 100%, 50%)`
+                  ),
+                },
+              ],
+            }}
+            options={{
+              plugins: {
+                tooltip: {
+                  callbacks: {
+                    label: (context) => {
+                      const label = context.label || "";
+                      const value = context.parsed || 0;
+                      return `${label}: ${value}s`;
+                    },
+                  },
+                },
+              },
+            }}
+            width={400}
+            height={400}
+          />
+        </div>
       )}
+      <span>Data</span>
+      <ul>
+        {sitesData.map((site) => (
+          <li key={site.url}>
+            {site.url} - {formatSeconds(site.timeSpent / 1000)}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
