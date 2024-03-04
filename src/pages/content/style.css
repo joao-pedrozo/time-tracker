@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* https://tailwindcss.com/docs/preflight#border-styles-are-reset-globally */
+/* https://github.com/tailwindlabs/tailwindcss/issues/1167#issuecomment-1257033795 */
 *,
 ::before,
 ::after {
@@ -10,8 +12,6 @@
     border-color: transparent;
 }
 
-/* https://tailwindcss.com/docs/preflight#border-styles-are-reset-globally */
-/* https://github.com/tailwindlabs/tailwindcss/issues/1167#issuecomment-1257033795 */
 .langin {
     color: aliceblue;
 }
