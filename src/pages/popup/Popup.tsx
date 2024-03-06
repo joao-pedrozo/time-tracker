@@ -9,7 +9,10 @@ ChartJS.register(Tooltip);
 interface SitesData {
   url: string;
   lastRecorded: Date;
-  timeSpent: number;
+  days: {
+    date: string;
+    timeSpent: number;
+  }[];
 }
 
 function formatSeconds(seconds: number) {
@@ -37,11 +40,28 @@ function formatSeconds(seconds: number) {
 
 const percentage = (value: number, total: number) => (value / total) * 100;
 
-const orderedSitesData = (sitesData: SitesData[]) =>
-  sitesData.sort((a, b) => b.timeSpent - a.timeSpent);
+const totalOrderedSitesData = (sitesData: SitesData[]) => {
+  return sitesData.sort(() => {
+    const aTotalTime = sitesData.reduce(
+      (acc, site) =>
+        acc + site.days.reduce((acc, day) => acc + day.timeSpent, 0),
+      0
+    );
+    const bTotalTime = sitesData.reduce(
+      (acc, site) =>
+        acc + site.days.reduce((acc, day) => acc + day.timeSpent, 0),
+      0
+    );
+
+    return bTotalTime - aTotalTime;
+  });
+};
 
 const getTopSites = (sitesData: SitesData[], limit: number) =>
-  orderedSitesData(sitesData).slice(0, limit);
+  totalOrderedSitesData(sitesData).slice(0, limit);
+
+const getSiteTotalTimeSpent = (site: SitesData) =>
+  site.days.reduce((acc, day) => acc + day.timeSpent, 0);
 
 export default function Popup(): JSX.Element {
   const [sitesData, setSitesData] = useState<SitesData[]>([]);
@@ -86,21 +106,21 @@ export default function Popup(): JSX.Element {
         <div className="max-w-[260px] max-h-[260px]">
           <Doughnut
             data={{
-              labels: orderedSitesData(getTopSites(sitesData, 9)).map(
+              labels: totalOrderedSitesData(getTopSites(sitesData, 9)).map(
                 (site) => site.url
               ),
               datasets: [
                 {
-                  data: orderedSitesData(getTopSites(sitesData, 9)).map(
-                    (site) => site.timeSpent / 1000
+                  data: totalOrderedSitesData(getTopSites(sitesData, 9)).map(
+                    (site) => getSiteTotalTimeSpent(site) / 1000
                   ),
-                  backgroundColor: orderedSitesData(
+                  backgroundColor: totalOrderedSitesData(
                     getTopSites(sitesData, 9)
                   ).map(
                     (_, index) =>
                       `hsl(${
                         (index * 360) /
-                        orderedSitesData(getTopSites(sitesData, 9)).length
+                        totalOrderedSitesData(getTopSites(sitesData, 9)).length
                       }, 100%, 50%)`
                   ),
                 },
@@ -125,7 +145,7 @@ export default function Popup(): JSX.Element {
         </div>
       )}
       <ul className="w-full text-[14px] text-neutral-600 mt-8 p-4 pb-2">
-        {orderedSitesData(getTopSites(sitesData, 9)).map((site, index) => (
+        {totalOrderedSitesData(getTopSites(sitesData, 9)).map((site, index) => (
           <li key={site.url} className="flex justify-between gap-4">
             <div className="max-w-[200px] truncate flex gap-1 items-center">
               <div
@@ -133,7 +153,7 @@ export default function Popup(): JSX.Element {
                 style={{
                   backgroundColor: `hsl(${
                     (index * 360) /
-                    orderedSitesData(getTopSites(sitesData, 9)).length
+                    totalOrderedSitesData(getTopSites(sitesData, 9)).length
                   }, 100%, 50%)`,
                 }}
               ></div>
@@ -144,13 +164,18 @@ export default function Popup(): JSX.Element {
             <div className="flex gap-2 flex-nowrap">
               <span className="whitespace-nowrap">
                 {percentage(
-                  site.timeSpent,
-                  sitesData.reduce((acc, site) => acc + site.timeSpent, 0)
+                  getSiteTotalTimeSpent(site),
+                  sitesData.reduce(
+                    (acc, site) =>
+                      acc +
+                      site.days.reduce((acc, day) => acc + day.timeSpent, 0),
+                    0
+                  )
                 ).toFixed(2)}
                 %
               </span>
               <span className="whitespace-nowrap">
-                {formatSeconds(site.timeSpent / 1000)}
+                {formatSeconds(getSiteTotalTimeSpent(site) / 1000)}
               </span>
             </div>
           </li>

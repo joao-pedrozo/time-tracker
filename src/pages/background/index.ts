@@ -1,3 +1,7 @@
+const generateSiteData = ({ url }) => {
+  return {};
+};
+
 setInterval(() => {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     if (!tabs[0] || !tabs[0].url) {
@@ -13,24 +17,66 @@ setInterval(() => {
           sitesData: [
             {
               url: domain,
-              lastRecorded: new Date(),
-              timeSpent: 1000,
+              lastRecorded: new Date().toDateString(),
+              days: [
+                {
+                  date: new Date().toDateString(),
+                  timeSpent: 0,
+                },
+              ],
             },
           ],
         });
         return;
       }
 
-      if (data.sitesData.find((site) => site.url === domain)) {
-        const newWebsites = data.sitesData.map((site) => {
-          if (site.url === domain) {
+      const urlAlreadyRegistered = data.sitesData.some(
+        (site: any) => site.url === domain
+      );
+
+      if (urlAlreadyRegistered) {
+        const newWebsites = data.sitesData.map((site: any) => {
+          const isCurrentIteration = site.url === domain;
+
+          if (isCurrentIteration) {
+            const hasSwitchedDay =
+              new Date().getDate() !== new Date(site.lastRecorded).getDate();
+
+            if (hasSwitchedDay) {
+              return {
+                ...site,
+                lastRecorded: new Date().toDateString(),
+                days: [
+                  ...site.days,
+                  {
+                    date: new Date().toDateString(),
+                    timeSpent: 0,
+                  },
+                ],
+              };
+            }
+
             return {
               ...site,
-              timeSpent: site.timeSpent + 1000,
+              lastRecorded: new Date().toDateString(),
+              days: site.days.map((day: any) => {
+                const isCurrentDay = day.date === new Date().toDateString();
+
+                if (isCurrentDay) {
+                  return {
+                    ...day,
+                    timeSpent: day.timeSpent + 1000,
+                  };
+                }
+
+                return day;
+              }),
             };
           }
+
           return site;
         });
+
         chrome.storage.local.set({
           sitesData: newWebsites,
         });
@@ -40,8 +86,13 @@ setInterval(() => {
             ...data.sitesData,
             {
               url: domain,
-              lastRecorded: new Date(),
-              timeSpent: 0,
+              lastRecorded: new Date().toDateString(),
+              days: [
+                {
+                  date: new Date().toDateString(),
+                  timeSpent: 0,
+                },
+              ],
             },
           ],
         });
