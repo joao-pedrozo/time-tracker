@@ -15,6 +15,8 @@ interface SitesData {
   }[];
 }
 
+const blacklistedSites = ["extensions", "newtab"];
+
 function formatSeconds(seconds: number) {
   const hours = Math.floor(seconds / 3600);
   const remainingMinutes = Math.floor((seconds % 3600) / 60);
@@ -100,8 +102,12 @@ export default function Popup(): JSX.Element {
     }
   };
 
-  const filteredSitesData = sitesData.filter((site) =>
-    site.days.some((day) => day.date === currentDay)
+  const filteredSitesData = sitesData.filter(
+    (site) =>
+      site.days.some((day) => day.date === currentDay) &&
+      !blacklistedSites.some((blacklistedSite) =>
+        site.url.includes(blacklistedSite)
+      )
   );
 
   const chartLabels = totalOrderedSitesData(
