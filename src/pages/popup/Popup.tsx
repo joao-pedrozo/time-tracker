@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { MoonStars, GithubLogo } from "@phosphor-icons/react";
 import WebsitesList from "./WebsitesList";
 import WebsitesChart from "./WebsitesChart";
+import Header from "./Header";
 
 export interface SitesData {
   url: string;
@@ -42,8 +42,6 @@ export default function Popup(): JSX.Element {
   const [currentDay, setCurrentDay] = useState<string>("");
 
   useEffect(() => {
-    console.log("Popup mounted");
-
     chrome.storage.local.get("sitesData", (data) => {
       console.log(data);
 
@@ -84,28 +82,7 @@ export default function Popup(): JSX.Element {
 
   return (
     <div className="flex items-center flex-col bg-white dark:dark:bg-[#0f0f0f]">
-      <header className="w-full font-bold text-2xl flex justify-between items-center px-4 py-4">
-        <h1 className="mb-4 bg-gradient-to-r from-green-400 to-blue-500 inline-block text-transparent bg-clip-text">
-          Webtime Tracker
-        </h1>
-        <div className="mt-[-8px] flex gap-2">
-          <button
-            onClick={() => {
-              const body = document.querySelector("body");
-              body?.classList.toggle("dark");
-            }}
-          >
-            <MoonStars className="p-0 text-black dark:text-white" size={24} />
-          </button>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://github.com/joao-pedrozo/time-tracker"
-          >
-            <GithubLogo className="p-0 text-black dark:text-white" size={24} />
-          </a>
-        </div>
-      </header>
+      <Header />
       <div className="flex justify-between items-center px-4 py-2 gap-2 text-white">
         <button onClick={handlePreviousDay}>Previous Day</button>
         <h2>{currentDay}</h2>
