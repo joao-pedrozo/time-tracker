@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import { Doughnut } from "react-chartjs-2";
-import { ArcElement, Chart as ChartJS, Tooltip } from "chart.js";
 import { MoonStars, GithubLogo } from "@phosphor-icons/react";
+import WebsitesList from "./WebsitesList";
+import WebsitesChart from "./WebsitesChart";
 
-ChartJS.register(ArcElement);
-ChartJS.register(Tooltip);
-
-interface SitesData {
+export interface SitesData {
   url: string;
   lastRecorded: Date;
   days: {
@@ -17,7 +14,7 @@ interface SitesData {
 
 const blacklistedSites = ["extensions", "newtab"];
 
-function formatSeconds(seconds: number) {
+export function formatSeconds(seconds: number) {
   const hours = Math.floor(seconds / 3600);
   const remainingMinutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
@@ -39,31 +36,6 @@ function formatSeconds(seconds: number) {
 
   return formattedTime;
 }
-
-const percentage = (value: number, total: number) => (value / total) * 100;
-
-const totalOrderedSitesData = (sitesData: SitesData[]) => {
-  return sitesData.sort(() => {
-    const aTotalTime = sitesData.reduce(
-      (acc, site) =>
-        acc + site.days.reduce((acc, day) => acc + day.timeSpent, 0),
-      0
-    );
-    const bTotalTime = sitesData.reduce(
-      (acc, site) =>
-        acc + site.days.reduce((acc, day) => acc + day.timeSpent, 0),
-      0
-    );
-
-    return bTotalTime - aTotalTime;
-  });
-};
-
-const getTopSites = (sitesData: SitesData[], limit: number) =>
-  totalOrderedSitesData(sitesData).slice(0, limit);
-
-const getSiteTotalTimeSpent = (site: SitesData) =>
-  site.days.reduce((acc, day) => acc + day.timeSpent, 0);
 
 export default function Popup(): JSX.Element {
   const [sitesData, setSitesData] = useState<SitesData[]>([]);
@@ -110,27 +82,6 @@ export default function Popup(): JSX.Element {
       )
   );
 
-  const chartLabels = totalOrderedSitesData(
-    getTopSites(filteredSitesData, 9)
-  ).map((site) => site.url);
-
-  const chartDatasets = [
-    {
-      data: totalOrderedSitesData(getTopSites(filteredSitesData, 9)).map(
-        (site) => getSiteTotalTimeSpent(site) / 1000
-      ),
-      backgroundColor: totalOrderedSitesData(
-        getTopSites(filteredSitesData, 9)
-      ).map(
-        (_, index) =>
-          `hsl(${
-            (index * 360) /
-            totalOrderedSitesData(getTopSites(filteredSitesData, 9)).length
-          }, 100%, 50%)`
-      ),
-    },
-  ];
-
   return (
     <div className="flex items-center flex-col bg-white dark:dark:bg-[#0f0f0f]">
       <header className="w-full font-bold text-2xl flex justify-between items-center px-4 py-4">
@@ -161,58 +112,10 @@ export default function Popup(): JSX.Element {
         <button onClick={handleNextDay}>Next Day</button>
       </div>
       {filteredSitesData.length > 0 && (
-        <div className="max-w-[260px] max-h-[260px]">
-          <Doughnut
-            data={{
-              labels: chartLabels,
-              datasets: chartDatasets,
-            }}
-            options={{
-              plugins: {
-                tooltip: {
-                  callbacks: {
-                    label: (context) => {
-                      const value = context.parsed || 0;
-                      return formatSeconds(value);
-                    },
-                  },
-                },
-              },
-            }}
-            width={400}
-            height={400}
-          />
-        </div>
+        <WebsitesChart sites={filteredSitesData} />
       )}
       {filteredSitesData.length > 0 && (
-        <ul className="w-full text-[14px] text-neutral-600 mt-2 p-4 pb-2">
-          {filteredSitesData.map((site) => (
-            <li key={site.url} className="flex justify-between gap-4">
-              <div className="max-w-[200px] truncate flex gap-1 items-center">
-                <div
-                  className="w-[6px] h-[6px] rounded-full"
-                  style={{
-                    backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`,
-                  }}
-                ></div>
-                <span className="font-bold w-[200px] dark:text-[#e8e8e8]">
-                  {site.url}
-                </span>
-              </div>
-              <ul className="flex gap-2 flex-nowrap">
-                {site.days
-                  .filter((day) => day.date === currentDay)
-                  .map((day) => (
-                    <li key={day.date}>
-                      <span className="whitespace-nowrap">
-                        {formatSeconds(day.timeSpent / 1000)}
-                      </span>
-                    </li>
-                  ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+        <WebsitesList currentDay={currentDay} websites={filteredSitesData} />
       )}
     </div>
   );
