@@ -65,6 +65,7 @@ const getSiteTotalTimeSpent = (site: SitesData) =>
 
 export default function Popup(): JSX.Element {
   const [sitesData, setSitesData] = useState<SitesData[]>([]);
+  const [currentDay, setCurrentDay] = useState<string>("");
 
   useEffect(() => {
     console.log("Popup mounted");
@@ -74,9 +75,34 @@ export default function Popup(): JSX.Element {
 
       if (data && data.sitesData) {
         setSitesData(data.sitesData);
+        setCurrentDay(data.sitesData[0]?.days[0]?.date || "");
       }
     });
   }, []);
+
+  const handlePreviousDay = () => {
+    const currentIndex = sitesData.findIndex((site) =>
+      site.days.some((day) => day.date === currentDay)
+    );
+    if (currentIndex > 0) {
+      const previousDay = sitesData[currentIndex - 1].days[0].date;
+      setCurrentDay(previousDay);
+    }
+  };
+
+  const handleNextDay = () => {
+    const currentIndex = sitesData.findIndex((site) =>
+      site.days.some((day) => day.date === currentDay)
+    );
+    if (currentIndex < sitesData.length - 1) {
+      const nextDay = sitesData[currentIndex + 1].days[0].date;
+      setCurrentDay(nextDay);
+    }
+  };
+
+  const filteredSitesData = sitesData.filter((site) =>
+    site.days.some((day) => day.date === currentDay)
+  );
 
   return (
     <div className="flex items-center flex-col bg-white dark:dark:bg-[#0f0f0f]">
@@ -102,25 +128,31 @@ export default function Popup(): JSX.Element {
           </a>
         </div>
       </header>
-      {sitesData && (
+      <div className="flex justify-between items-center px-4 py-2 text-white">
+        <button onClick={handlePreviousDay}>Previous Day</button>
+        <h2>{currentDay}</h2>
+        <button onClick={handleNextDay}>Next Day</button>
+      </div>
+      {filteredSitesData.length > 0 && (
         <div className="max-w-[260px] max-h-[260px]">
           <Doughnut
             data={{
-              labels: totalOrderedSitesData(getTopSites(sitesData, 9)).map(
-                (site) => site.url
-              ),
+              labels: totalOrderedSitesData(
+                getTopSites(filteredSitesData, 9)
+              ).map((site) => site.url),
               datasets: [
                 {
-                  data: totalOrderedSitesData(getTopSites(sitesData, 9)).map(
-                    (site) => getSiteTotalTimeSpent(site) / 1000
-                  ),
+                  data: totalOrderedSitesData(
+                    getTopSites(filteredSitesData, 9)
+                  ).map((site) => getSiteTotalTimeSpent(site) / 1000),
                   backgroundColor: totalOrderedSitesData(
-                    getTopSites(sitesData, 9)
+                    getTopSites(filteredSitesData, 9)
                   ).map(
                     (_, index) =>
                       `hsl(${
                         (index * 360) /
-                        totalOrderedSitesData(getTopSites(sitesData, 9)).length
+                        totalOrderedSitesData(getTopSites(filteredSitesData, 9))
+                          .length
                       }, 100%, 50%)`
                   ),
                 },
@@ -131,7 +163,6 @@ export default function Popup(): JSX.Element {
                 tooltip: {
                   callbacks: {
                     label: (context) => {
-                      const label = context.label || "";
                       const value = context.parsed || 0;
                       return formatSeconds(value);
                     },
@@ -144,43 +175,36 @@ export default function Popup(): JSX.Element {
           />
         </div>
       )}
-      <ul className="w-full text-[14px] text-neutral-600 mt-8 p-4 pb-2">
-        {totalOrderedSitesData(getTopSites(sitesData, 9)).map((site, index) => (
-          <li key={site.url} className="flex justify-between gap-4">
-            <div className="max-w-[200px] truncate flex gap-1 items-center">
-              <div
-                className="w-[6px] h-[6px] rounded-full"
-                style={{
-                  backgroundColor: `hsl(${
-                    (index * 360) /
-                    totalOrderedSitesData(getTopSites(sitesData, 9)).length
-                  }, 100%, 50%)`,
-                }}
-              ></div>
-              <span className="font-bold w-[200px] dark:text-[#e8e8e8]">
-                {site.url}
-              </span>
-            </div>
-            <div className="flex gap-2 flex-nowrap">
-              <span className="whitespace-nowrap">
-                {percentage(
-                  getSiteTotalTimeSpent(site),
-                  sitesData.reduce(
-                    (acc, site) =>
-                      acc +
-                      site.days.reduce((acc, day) => acc + day.timeSpent, 0),
-                    0
-                  )
-                ).toFixed(2)}
-                %
-              </span>
-              <span className="whitespace-nowrap">
-                {formatSeconds(getSiteTotalTimeSpent(site) / 1000)}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {filteredSitesData.length > 0 && (
+        <ul className="w-full text-[14px] text-neutral-600 mt-2 p-4 pb-2">
+          {filteredSitesData.map((site) => (
+            <li key={site.url} className="flex justify-between gap-4">
+              <div className="max-w-[200px] truncate flex gap-1 items-center">
+                <div
+                  className="w-[6px] h-[6px] rounded-full"
+                  style={{
+                    backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                  }}
+                ></div>
+                <span className="font-bold w-[200px] dark:text-[#e8e8e8]">
+                  {site.url}
+                </span>
+              </div>
+              <ul className="flex gap-2 flex-nowrap">
+                {site.days
+                  .filter((day) => day.date === currentDay)
+                  .map((day) => (
+                    <li key={day.date}>
+                      <span className="whitespace-nowrap">
+                        {formatSeconds(day.timeSpent / 1000)}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
