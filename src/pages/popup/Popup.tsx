@@ -100,10 +100,8 @@ export default function Popup(): JSX.Element {
     }
   };
 
-  const filteredSitesData = sitesData.filter(
-    (site) =>
-      site.days.some((day) => day.date === currentDay) &&
-      site.url.includes("www")
+  const filteredSitesData = sitesData.filter((site) =>
+    site.days.some((day) => day.date === currentDay)
   );
 
   const chartLabels = totalOrderedSitesData(
