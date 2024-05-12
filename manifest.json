@@ -21,21 +21,6 @@
     "storage",
     "tabs"
   ],
-  "content_scripts": [
-    {
-      "matches": [
-        "http://*/*",
-        "https://*/*",
-        "<all_urls>"
-      ],
-      "js": [
-        "src/pages/content/index.tsx"
-      ],
-      "css": [
-        "contentStyle.css"
-      ]
-    }
-  ],
   "web_accessible_resources": [
     {
       "resources": [
