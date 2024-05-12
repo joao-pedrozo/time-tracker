@@ -100,9 +100,32 @@ export default function Popup(): JSX.Element {
     }
   };
 
-  const filteredSitesData = sitesData.filter((site) =>
-    site.days.some((day) => day.date === currentDay)
+  const filteredSitesData = sitesData.filter(
+    (site) =>
+      site.days.some((day) => day.date === currentDay) &&
+      site.url.includes("www")
   );
+
+  const chartLabels = totalOrderedSitesData(
+    getTopSites(filteredSitesData, 9)
+  ).map((site) => site.url);
+
+  const chartDatasets = [
+    {
+      data: totalOrderedSitesData(getTopSites(filteredSitesData, 9)).map(
+        (site) => getSiteTotalTimeSpent(site) / 1000
+      ),
+      backgroundColor: totalOrderedSitesData(
+        getTopSites(filteredSitesData, 9)
+      ).map(
+        (_, index) =>
+          `hsl(${
+            (index * 360) /
+            totalOrderedSitesData(getTopSites(filteredSitesData, 9)).length
+          }, 100%, 50%)`
+      ),
+    },
+  ];
 
   return (
     <div className="flex items-center flex-col bg-white dark:dark:bg-[#0f0f0f]">
@@ -128,7 +151,7 @@ export default function Popup(): JSX.Element {
           </a>
         </div>
       </header>
-      <div className="flex justify-between items-center px-4 py-2 text-white">
+      <div className="flex justify-between items-center px-4 py-2 gap-2 text-white">
         <button onClick={handlePreviousDay}>Previous Day</button>
         <h2>{currentDay}</h2>
         <button onClick={handleNextDay}>Next Day</button>
@@ -137,26 +160,8 @@ export default function Popup(): JSX.Element {
         <div className="max-w-[260px] max-h-[260px]">
           <Doughnut
             data={{
-              labels: totalOrderedSitesData(
-                getTopSites(filteredSitesData, 9)
-              ).map((site) => site.url),
-              datasets: [
-                {
-                  data: totalOrderedSitesData(
-                    getTopSites(filteredSitesData, 9)
-                  ).map((site) => getSiteTotalTimeSpent(site) / 1000),
-                  backgroundColor: totalOrderedSitesData(
-                    getTopSites(filteredSitesData, 9)
-                  ).map(
-                    (_, index) =>
-                      `hsl(${
-                        (index * 360) /
-                        totalOrderedSitesData(getTopSites(filteredSitesData, 9))
-                          .length
-                      }, 100%, 50%)`
-                  ),
-                },
-              ],
+              labels: chartLabels,
+              datasets: chartDatasets,
             }}
             options={{
               plugins: {
