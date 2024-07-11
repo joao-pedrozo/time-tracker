@@ -27,6 +27,9 @@
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^1.0.14",
+    "@testing-library/dom": "^10.3.1",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
     "@types/chrome": "^0.0.253",
     "@types/node": "^18.17.1",
     "@types/react": "^18.2.39",
@@ -43,6 +46,7 @@
     "eslint-plugin-react": "^7.32.1",
     "eslint-plugin-react-hooks": "^4.3.0",
     "fs-extra": "^11.1.0",
+    "jsdom": "^24.1.0",
     "nodemon": "^2.0.20",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
