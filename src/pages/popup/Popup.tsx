@@ -72,18 +72,33 @@ export default function Popup(): JSX.Element {
     }
   };
 
-  const filteredSitesData = sitesData.filter(
-    (site) =>
-      site.days.some((day) => day.date === currentDay) &&
-      !blacklistedSites.some((blacklistedSite) =>
-        site.url.includes(blacklistedSite)
-      )
-  );
+  const filteredSitesData = sitesData
+    .filter(
+      (site) =>
+        site.days.some((day) => day.date === currentDay) &&
+        !blacklistedSites.some((blacklistedSite) =>
+          site.url.includes(blacklistedSite)
+        )
+    )
+    .map((site) => ({
+      ...site,
+      url: site.url.replace("www.", ""),
+    }))
+    .sort((a, b) => {
+      const siteA = a.days.find((day) => day.date === currentDay);
+      const siteB = b.days.find((day) => day.date === currentDay);
+
+      if (!siteA || !siteB) {
+        return 0;
+      }
+
+      return siteB.timeSpent - siteA.timeSpent;
+    });
 
   return (
     <div className="flex items-center flex-col bg-white dark:dark:bg-[#0f0f0f]">
       <Header />
-      <div className="flex justify-between items-center px-4 py-2 gap-2 text-white">
+      <div className="flex justify-between items-center px-4 py-2 gap-2 text-white my-[9px]">
         <button onClick={handlePreviousDay}>Previous Day</button>
         <h2>{currentDay}</h2>
         <button onClick={handleNextDay}>Next Day</button>
