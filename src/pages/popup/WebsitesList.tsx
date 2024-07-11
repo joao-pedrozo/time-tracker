@@ -1,4 +1,5 @@
-import { SitesData, formatSeconds } from "./Popup";
+import formatSeconds from "@src/utils/formatSeconds";
+import type { SitesData } from "./Popup";
 
 export default function WebsitesList({
   websites,

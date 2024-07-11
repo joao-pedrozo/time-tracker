@@ -1,6 +1,7 @@
 import { Doughnut } from "react-chartjs-2";
 import { ArcElement, Chart as ChartJS, Tooltip } from "chart.js";
-import { SitesData, formatSeconds } from "./Popup";
+import type { SitesData } from "./Popup";
+import formatSeconds from "@src/utils/formatSeconds";
 
 ChartJS.register(ArcElement);
 ChartJS.register(Tooltip);
