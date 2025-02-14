@@ -16,7 +16,7 @@ export default function WebsitesList({
             <div
               className="w-[6px] h-[6px] rounded-full"
               style={{
-                backgroundColor: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                backgroundColor: `hsl(${Math.random() * 360}, 60%, 50%)`,
               }}
             ></div>
             <span className="font-bold w-[200px] dark:text-[#e8e8e8]">

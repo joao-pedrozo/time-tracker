@@ -43,7 +43,7 @@ export default function WebsitesChart({ sites }: { sites: SitesData[] }) {
         (_, index) =>
           `hsl(${
             (index * 360) / totalOrderedSitesData(getTopSites(sites, 9)).length
-          }, 100%, 50%)`
+          }, 50%, 50%)`
       ),
     },
   ];
