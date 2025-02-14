@@ -75,7 +75,7 @@ export default function Popup(): JSX.Element {
   return (
     <div className="flex items-center flex-col bg-white dark:dark:bg-[#0f0f0f]">
       <Header />
-      <div className="flex justify-between items-center px-4 py-2 gap-2 text-white my-[9px]">
+      <div className="flex justify-between items-center px-4 gap-2 text-white mt-[8px] mb-[18px]">
         <button onClick={handlePreviousDay}>Previous Day</button>
         <h2>{currentDay}</h2>
         <button onClick={handleNextDay}>Next Day</button>
